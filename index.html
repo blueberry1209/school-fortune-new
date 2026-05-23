@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>오늘의 학교 생존 운세</title>
+  <title>오늘의 학교 생존력 테스트</title>
   <style>
     /* 페이지 전체 기본 설정 */
     * {
@@ -23,7 +23,7 @@
       padding: 24px;
     }
 
-    /* 메인 카드 (입력 영역) */
+    /* 메인 카드 */
     .card {
       background: #ffffff;
       border-radius: 20px;
@@ -47,8 +47,8 @@
       margin-bottom: 28px;
     }
 
-    /* 운세 보기 버튼 */
-    .btn-fortune {
+    /* 생존력 확인 버튼 */
+    .btn-check {
       background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
       color: white;
       border: none;
@@ -62,12 +62,12 @@
       max-width: 280px;
     }
 
-    .btn-fortune:hover {
+    .btn-check:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(17, 153, 142, 0.45);
     }
 
-    .btn-fortune:active {
+    .btn-check:active {
       transform: translateY(0);
     }
 
@@ -91,6 +91,16 @@
       display: block;
       opacity: 1;
       transform: translateY(0);
+    }
+
+    .result-title {
+      font-size: 1.05rem;
+      color: #2d3748;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
     }
 
     .result-item {
@@ -127,30 +137,31 @@
 <body>
   <!-- 메인 카드 -->
   <div class="card">
-    <h1>오늘의 학교 생존 운세</h1>
-    <p class="subtitle">오늘 하루, 교실에서 살아남을 수 있을까?</p>
+    <h1>오늘의 학교 생존력 테스트</h1>
+    <p class="subtitle">버튼 한 번으로 오늘의 학교 생존 스펙을 확인해 보세요.</p>
 
-    <!-- 운세 보기 버튼 -->
-    <button type="button" class="btn-fortune" id="btnFortune">오늘의 운세 보기</button>
+    <!-- 생존력 확인 버튼 -->
+    <button type="button" class="btn-check" id="btnCheck">생존력 확인하기</button>
 
     <!-- 결과가 나올 카드 (처음엔 비어 있음) -->
     <div class="result-card" id="resultCard">
+      <h2 class="result-title">오늘의 생존 결과</h2>
       <div class="result-item">
-        <div class="result-label">오늘의 운세</div>
-        <div class="result-text" id="fortuneText">-</div>
+        <div class="result-label">오늘의 예측</div>
+        <div class="result-text" id="predictText">-</div>
       </div>
       <div class="result-item">
         <div class="result-label">발표 걸릴 확률</div>
         <div class="result-text">
-          <span class="probability" id="probabilityText">0</span>% 😱
+          <span class="probability" id="probabilityText">0</span>%
         </div>
       </div>
       <div class="result-item">
-        <div class="result-label">행운의 아이템</div>
-        <div class="result-text" id="luckyItemText">-</div>
+        <div class="result-label">생존 장비</div>
+        <div class="result-text" id="gearText">-</div>
       </div>
       <div class="result-item">
-        <div class="result-label">조심할 일</div>
+        <div class="result-label">주의 구간</div>
         <div class="result-text" id="cautionText">-</div>
       </div>
       <div class="result-item">
@@ -161,66 +172,66 @@
   </div>
 
   <script>
-    // ===== 학교 생활 관련 재미있는 문구 목록 =====
+    // ===== 학교 생활 관련 문구 목록 =====
 
-    // 오늘의 운세 문구들
-    const fortunes = [
-      "오늘은 급식이 맛있을 확률이 높아요. 점심시간이 기대됩니다!",
-      "친구가 과자를 나눠줄 운세예요. 인기 만점의 하루!",
-      "쉬는 시간에 재미있는 이야기를 들을 수 있어요.",
-      "시험은 없지만, 선생님 눈치는 살펴보세요.",
-      "오늘은 '모르겠습니다' 대신 '한번 찾아볼게요'가 통하는 날!",
-      "체육 시간에 공이 잘 맞을 운세. MVP 각?",
-      "조용히 앉아 있으면 하루가 평화롭게 지나갑니다.",
-      "복도에서 반 친구와 우연히 마주치면 행운!",
-      "오답노트를 꺼내면 실력이 오르는 마법의 날이에요.",
-      "오늘은 필기구를 잃어버리지 않는 희귀한 날입니다."
+    // 오늘의 예측 문구들
+    const predictions = [
+      "급식 메뉴가 의외로 괜찮을 가능성. 점심만큼은 기대해도 됨.",
+      "조별 과제에서 말은 적어도 존재감은 챙기는 날.",
+      "시험은 없지만 수행평가 언급 확률은 상시 상주.",
+      "'잠깐만요' 한 마디가 오늘의 생존 키워드.",
+      "쉬는 시간 10분이 10초처럼 느껴지는 타임라인.",
+      "복도에서 담임과 마주쳐도 자연스럽게 인사하면 무사 통과.",
+      "필기구 분실 없이 하루 종료 — 희귀 이벤트 발생 가능.",
+      "모르는 문제는 '확인해 볼게요'가 통하는 커뮤니케이션 데이.",
+      "체육 시간 체력 소모는 있지만 분위기는 나쁘지 않음.",
+      "오답노트 한 페이지만 정리해도 성취감 버프."
     ];
 
-    // 행운의 아이템 목록
-    const luckyItems = [
-      "샤프 (0.5mm)",
-      "물티슈 한 장",
-      "만년필",
-      "고무줄",
-      "필통 속 비상 과자",
-      "충전 100% 폰",
-      "양말 한 짝 (왼쪽)",
+    // 생존 장비 목록
+    const survivalGear = [
+      "0.5 샤프 + 여분 심",
+      "충전 완료된 이어폰",
+      "물티슈 (1장이면 충분)",
+      "필통 속 에너지바",
+      "창가 뒤쪽 자리",
+      "만년필 (검은색)",
       "교과서 책갈피",
-      "우유 맛 껌",
-      "교실 뒤쪽 창가 자리"
+      "보조배터리",
+      "편한 운동화",
+      "쉬는 시간용 텀블러"
     ];
 
-    // 조심할 일 목록
+    // 주의 구간 목록
     const cautions = [
-      "수업 중 졸다가 선생님과 눈이 마주치지 마세요.",
-      "복도에서 뛰면 담임 선생님이 나타날 수 있어요.",
-      "친구에게 '이거 답 알아?'라고 크게 묻지 마세요.",
-      "급식 줄에서 친구랑 떠들다가 맨 뒤로 갈 수 있어요.",
-      "시험지 뒤집어서 제출하는 실수 조심!",
-      "체육복 안 가져왔다고 변명하기 전에 가방 확인!",
-      "칠판 지우개 가루를 옷에 묻히지 마세요.",
-      "조별 과제에서 '나도 할게'만 말하고 끝내지 마세요."
+      "수업 중 스마트폰 각도 조절 실패 금지.",
+      "복도 질주 시 담임 스폰 확률 급상승.",
+      "시험지 앞뒤 확인 없이 제출하지 말 것.",
+      "조별 과제에서 '나도 할게'만 남기고 잠수 금지.",
+      "급식 줄 떠들다가 맨 뒤 번호표 받기 주의.",
+      "친구에게 '이거 답 뭐야?'를 교실에서 크게 묻지 말 것.",
+      "체육복 미지참 변명 전에 가방부터 확인.",
+      "칠판 지우개 가루 옷에 묻히면 하루 종일 신경 쓰임."
     ];
 
     // 생존 팁 목록
     const survivalTips = [
-      "모르는 문제는 일단 넘버링만 해두고 나중에 풀어보세요.",
-      "선생님이 질문할 때는 시선을 살짝 책상으로… 아니, 정면을 보세요!",
-      "쉬는 시간 5분 전에 화장실 다녀오면 수업 중 편해요.",
-      "친구에게 빌린 필통은 반납 전에 사진 찍어두면 분실 방지!",
-      "급식 줄은 1교시 끝나자마자 가면 승리합니다.",
-      "발표 걸리면 크게 말할수록 자신감 있어 보여요.",
-      "숙제는 점심시간 전에 한 개만이라도 해두세요.",
-      "교실 문 앞 자리는 출석 체크에 유리합니다."
+      "모르는 문제는 일단 번호만 매기고 후반에 풀기.",
+      "선생님 질문엔 1초 뒤에 시선 정면 + 짧은 답변.",
+      "쉬는 시간 시작 3분 전에 화장실 가면 수업 중 편함.",
+      "빌린 물건은 반납 전에 사진 한 장 — 분실 방지.",
+      "급식은 1교시 끝나자마자 줄 서면 시간 아낌.",
+      "발표는 속도보다 또박또박이 더 안전함.",
+      "숙제는 점심 전에 1개만이라도 처리해 두기.",
+      "출석 체크 자리는 교실 앞쪽이 유리한 경우가 많음."
     ];
 
     // ===== DOM 요소 가져오기 =====
-    const btnFortune = document.getElementById("btnFortune");
+    const btnCheck = document.getElementById("btnCheck");
     const resultCard = document.getElementById("resultCard");
-    const fortuneText = document.getElementById("fortuneText");
+    const predictText = document.getElementById("predictText");
     const probabilityText = document.getElementById("probabilityText");
-    const luckyItemText = document.getElementById("luckyItemText");
+    const gearText = document.getElementById("gearText");
     const cautionText = document.getElementById("cautionText");
     const tipText = document.getElementById("tipText");
 
@@ -236,11 +247,11 @@
     }
 
     // 버튼 클릭 시 실행
-    btnFortune.addEventListener("click", function () {
+    btnCheck.addEventListener("click", function () {
       // 각 항목에 랜덤 값 넣기
-      fortuneText.textContent = pickRandom(fortunes);
+      predictText.textContent = pickRandom(predictions);
       probabilityText.textContent = randomPercent();
-      luckyItemText.textContent = pickRandom(luckyItems);
+      gearText.textContent = pickRandom(survivalGear);
       cautionText.textContent = pickRandom(cautions);
       tipText.textContent = pickRandom(survivalTips);
 
