@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘의 학교 생존 운세</title>
+  <style>
+    /* 페이지 전체 기본 설정 */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      /* 밝은 그라데이션 배경 */
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #ffecd2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    /* 메인 카드 (입력 영역) */
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      padding: 40px 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #2d3748;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #718096;
+      margin-bottom: 28px;
+    }
+
+    /* 운세 보기 버튼 */
+    .btn-fortune {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .btn-fortune:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-fortune:active {
+      transform: translateY(0);
+    }
+
+    /* 결과 카드 (처음엔 숨김) */
+    .result-card {
+      margin-top: 24px;
+      padding: 24px;
+      background: linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      text-align: left;
+      /* 부드럽게 나타나는 애니메이션용 */
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      display: none;
+    }
+
+    /* 버튼 누른 뒤 보이게 할 때 붙이는 클래스 */
+    .result-card.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .result-item {
+      margin-bottom: 16px;
+    }
+
+    .result-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      color: #667eea;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .result-text {
+      font-size: 0.95rem;
+      color: #2d3748;
+      line-height: 1.5;
+    }
+
+    /* 발표 확률 숫자 강조 */
+    .probability {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #e53e3e;
+    }
+  </style>
+</head>
+<body>
+  <!-- 메인 카드 -->
+  <div class="card">
+    <h1>오늘의 학교 생존 운세</h1>
+    <p class="subtitle">오늘 하루, 교실에서 살아남을 수 있을까?</p>
+
+    <!-- 운세 보기 버튼 -->
+    <button type="button" class="btn-fortune" id="btnFortune">오늘의 운세 보기</button>
+
+    <!-- 결과가 나올 카드 (처음엔 비어 있음) -->
+    <div class="result-card" id="resultCard">
+      <div class="result-item">
+        <div class="result-label">오늘의 운세</div>
+        <div class="result-text" id="fortuneText">-</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">발표 걸릴 확률</div>
+        <div class="result-text">
+          <span class="probability" id="probabilityText">0</span>% 😱
+        </div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">행운의 아이템</div>
+        <div class="result-text" id="luckyItemText">-</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">조심할 일</div>
+        <div class="result-text" id="cautionText">-</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">생존 팁</div>
+        <div class="result-text" id="tipText">-</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 학교 생활 관련 재미있는 문구 목록 =====
+
+    // 오늘의 운세 문구들
+    const fortunes = [
+      "오늘은 급식이 맛있을 확률이 높아요. 점심시간이 기대됩니다!",
+      "친구가 과자를 나눠줄 운세예요. 인기 만점의 하루!",
+      "쉬는 시간에 재미있는 이야기를 들을 수 있어요.",
+      "시험은 없지만, 선생님 눈치는 살펴보세요.",
+      "오늘은 '모르겠습니다' 대신 '한번 찾아볼게요'가 통하는 날!",
+      "체육 시간에 공이 잘 맞을 운세. MVP 각?",
+      "조용히 앉아 있으면 하루가 평화롭게 지나갑니다.",
+      "복도에서 반 친구와 우연히 마주치면 행운!",
+      "오답노트를 꺼내면 실력이 오르는 마법의 날이에요.",
+      "오늘은 필기구를 잃어버리지 않는 희귀한 날입니다."
+    ];
+
+    // 행운의 아이템 목록
+    const luckyItems = [
+      "샤프 (0.5mm)",
+      "물티슈 한 장",
+      "만년필",
+      "고무줄",
+      "필통 속 비상 과자",
+      "충전 100% 폰",
+      "양말 한 짝 (왼쪽)",
+      "교과서 책갈피",
+      "우유 맛 껌",
+      "교실 뒤쪽 창가 자리"
+    ];
+
+    // 조심할 일 목록
+    const cautions = [
+      "수업 중 졸다가 선생님과 눈이 마주치지 마세요.",
+      "복도에서 뛰면 담임 선생님이 나타날 수 있어요.",
+      "친구에게 '이거 답 알아?'라고 크게 묻지 마세요.",
+      "급식 줄에서 친구랑 떠들다가 맨 뒤로 갈 수 있어요.",
+      "시험지 뒤집어서 제출하는 실수 조심!",
+      "체육복 안 가져왔다고 변명하기 전에 가방 확인!",
+      "칠판 지우개 가루를 옷에 묻히지 마세요.",
+      "조별 과제에서 '나도 할게'만 말하고 끝내지 마세요."
+    ];
+
+    // 생존 팁 목록
+    const survivalTips = [
+      "모르는 문제는 일단 넘버링만 해두고 나중에 풀어보세요.",
+      "선생님이 질문할 때는 시선을 살짝 책상으로… 아니, 정면을 보세요!",
+      "쉬는 시간 5분 전에 화장실 다녀오면 수업 중 편해요.",
+      "친구에게 빌린 필통은 반납 전에 사진 찍어두면 분실 방지!",
+      "급식 줄은 1교시 끝나자마자 가면 승리합니다.",
+      "발표 걸리면 크게 말할수록 자신감 있어 보여요.",
+      "숙제는 점심시간 전에 한 개만이라도 해두세요.",
+      "교실 문 앞 자리는 출석 체크에 유리합니다."
+    ];
+
+    // ===== DOM 요소 가져오기 =====
+    const btnFortune = document.getElementById("btnFortune");
+    const resultCard = document.getElementById("resultCard");
+    const fortuneText = document.getElementById("fortuneText");
+    const probabilityText = document.getElementById("probabilityText");
+    const luckyItemText = document.getElementById("luckyItemText");
+    const cautionText = document.getElementById("cautionText");
+    const tipText = document.getElementById("tipText");
+
+    // 배열에서 랜덤으로 하나 골라주는 함수
+    function pickRandom(array) {
+      const index = Math.floor(Math.random() * array.length);
+      return array[index];
+    }
+
+    // 1부터 100 사이 랜덤 숫자 만들기
+    function randomPercent() {
+      return Math.floor(Math.random() * 100) + 1;
+    }
+
+    // 버튼 클릭 시 실행
+    btnFortune.addEventListener("click", function () {
+      // 각 항목에 랜덤 값 넣기
+      fortuneText.textContent = pickRandom(fortunes);
+      probabilityText.textContent = randomPercent();
+      luckyItemText.textContent = pickRandom(luckyItems);
+      cautionText.textContent = pickRandom(cautions);
+      tipText.textContent = pickRandom(survivalTips);
+
+      // 결과 카드 부드럽게 보이기
+      // 먼저 show 클래스를 빼서 애니메이션을 다시 시작할 수 있게 함
+      resultCard.classList.remove("show");
+
+      // 브라우저가 화면을 그린 뒤에 show를 붙여야 애니메이션이 잘 보임
+      void resultCard.offsetWidth; // 강제로 한 번 다시 그리기 (reflow)
+
+      resultCard.classList.add("show");
+    });
+  </script>
+</body>
+</html>
